@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  janusgraph:
+    image: docker.io/janusgraph/janusgraph:latest
+    container_name: jce-janusgraph
+    environment:
+      JANUS_PROPS_TEMPLATE: cassandra-es
+      janusgraph.storage.backend: cql
+      janusgraph.storage.hostname: jce-cassandra
+      janusgraph.index.search.hostname: jce-elasticsearch
+    ports:
+      - "8182:8182"
+    networks:
+      - jce-network
+    healthcheck:
+      test: ["CMD", "bin/gremlin.sh", "-e", "scripts/remote-connect.groovy"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+
+  jce-cassandra:
+    image: cassandra:latest
+    container_name: jce-cassandra
+    volumes:
+      - janusgraph-default-data:/var/lib/cassandra/data
+      - janusgraph-default-data:/var/lib/cassandra/hints
+    ports:
+      - 9042:9042
+    networks:
+      - jce-network
+
+  jce-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    container_name: jce-elastic
+    environment:
+      - node.name=jce-elasticsearch
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - http.host=0.0.0.0
+      - network.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - cluster.name=jce-docker-cluster
+      - xpack.security.enabled=false
+      - discovery.zen.minimum_master_nodes=1
+    volumes:
+      - janusgraph-default-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - jce-network
+
+  jce-kibana:
+    image: docker.elastic.co/kibana/kibana:7.14.0
+    container_name: jce-kibana
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://jce-elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://jce-elasticsearch:9200
+    networks:
+      - jce-network
+
+networks:
+  jce-network:
+volumes:
+  janusgraph-default-data:
