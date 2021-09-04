@@ -9,6 +9,7 @@ services:
       janusgraph.storage.backend: cql
       janusgraph.storage.hostname: jce-cassandra
       janusgraph.index.search.hostname: jce-elasticsearch
+      janusgraph.index.search.elasticsearch.client-only: "true"
     ports:
       - "8182:8182"
     networks:
@@ -50,16 +51,16 @@ services:
     networks:
       - jce-network
 
-  jce-kibana:
-    image: docker.elastic.co/kibana/kibana:7.14.0
-    container_name: jce-kibana
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_URL: http://jce-elasticsearch:9200
-      ELASTICSEARCH_HOSTS: http://jce-elasticsearch:9200
-    networks:
-      - jce-network
+  # jce-kibana:
+  #   image: docker.elastic.co/kibana/kibana:7.14.0
+  #   container_name: jce-kibana
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     ELASTICSEARCH_URL: http://jce-elasticsearch:9200
+  #     ELASTICSEARCH_HOSTS: http://jce-elasticsearch:9200
+  #   networks:
+  #     - jce-network
 
 networks:
   jce-network:
