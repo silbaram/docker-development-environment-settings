@@ -2,10 +2,10 @@ version: "3.8"
 
 services:
   janusgraph:
-    build: .
+    image: docker.io/janusgraph/janusgraph:latest
     container_name: jce-janusgraph
     environment:
-      JANUS_PROPS_TEMPLATE: cassandra-es
+      JANUS_PROPS_TEMPLATE: cql-es
       janusgraph.storage.backend: cql
       janusgraph.storage.hostname: jce-cassandra
       janusgraph.index.search.hostname: jce-elasticsearch
