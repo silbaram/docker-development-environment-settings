@@ -21,6 +21,18 @@ gremlin> :remote console
 gremlin> GraphOfTheGodsFactory.load(graph)
 ```
 
+# 스키마 보기
+```bash
+mgmt = graph.openManagement()
+mgmt.printSchema()
+```
+
+# 예제 데이터 지우기
+```bash
+gremlin> JanusGraphFactory.drop(graph);
+==>null
+```
+
 # cassandra 접속
 ```bash
 docker exec -it jce-cassandra cqlsh
