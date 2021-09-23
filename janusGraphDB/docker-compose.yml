@@ -10,6 +10,7 @@ services:
       janusgraph.storage.hostname: jce-cassandra
       janusgraph.index.search.hostname: jce-elasticsearch
       janusgraph.gremlin.graph: org.janusgraph.core.JanusGraphFactory
+      gremlinserver.gremlin-groovy.scriptEngines.scripts: script/JanusGraphSchemaImporter.groovy
     ports:
       - "8182:8182"
     networks:
