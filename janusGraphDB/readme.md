@@ -29,7 +29,7 @@ gremlin> GraphOfTheGodsFactory.load(graph)
 gremlin> :load JanusGraphSchemaImporter.groovy
 
 - 사용법
-gremlin> writeGraphSONSchema(graph, 'schema.json')
+gremlin> writeGraphSONSchema(graph, './schema/sample-schema.json')
 ```
 
 # 스키마 보기

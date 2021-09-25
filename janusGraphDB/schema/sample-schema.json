@@ -1,0 +1,9 @@
+{
+    "propertyKeys": [
+        {
+            "name": "userName",
+            "dataType": "String",
+            "cardinality": "SINGLE"
+        }
+    ]
+}

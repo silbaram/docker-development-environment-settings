@@ -24,6 +24,8 @@ RUN apt update -y && apt install -y gpg unzip curl && \
     rm -rf ${JANUS_HOME}/conf/janusgraph-*.properties && \
     rm -rf ${JANUS_HOME}/conf/gremlin-server
 
+RUN mkdir -p ${JANUS_HOME}/schema/
+
 COPY conf/ ${JANUS_HOME}/conf/
 COPY scripts/ ${JANUS_HOME}/scripts/
 
