@@ -1,13 +1,16 @@
+# Dockerfile 빌드
+```bash
+$ docker build --tag janusgraph/study:1.0 .
+```
+
 # docker-compose 실행
 ```bash
-docker-compose up -d
+$ docker-compose up -d
 ```
 
 # gremlin console 접속
-
 ```bash
-docker run --rm --link jce-janusgraph:janusgraph -e GREMLIN_REMOTE_HOSTS=jce-janusgraph --network janusgraphdb_jce-network \
-    -it janusgraph/janusgraph:latest ./bin/gremlin.sh
+$ docker run --rm --link jce-janusgraph:janusgraph -e GREMLIN_REMOTE_HOSTS=jce-janusgraph --network janusgraphdb_jce-network -it janusgraph/janusgraph:latest ./bin/gremlin.sh
 ```
 
 # gremlin console에서 tinkerpop.server 연결
@@ -19,6 +22,14 @@ gremlin> :remote console
 # 예제 데이터 로드
 ```bash
 gremlin> GraphOfTheGodsFactory.load(graph)
+```
+
+# 스키마 로드 groovy 스크립트 로드
+```bash
+gremlin> :load JanusGraphSchemaImporter.groovy
+
+- 사용법
+gremlin> writeGraphSONSchema(graph, 'schema.json')
 ```
 
 # 스키마 보기
