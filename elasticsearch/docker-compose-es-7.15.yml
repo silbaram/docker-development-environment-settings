@@ -1,0 +1,171 @@
+version: '2.2'
+services:
+  master-es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: master-es01
+    environment:
+      - node.name=master-es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=master-es01,master-es02,master-es03
+      - network.bind_host=0.0.0.0
+      - network.publish_host=master-es01
+      - discovery.seed_hosts=master-es01,master-es02,master-es03
+      - discovery.zen.minimum_master_nodes=2
+      - node.master=true
+      - node.data=false
+      - node.ingest=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # volumes:
+    #   - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - elastic
+
+  master-es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: master-es02
+    environment:
+      - node.name=master-es02
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=master-es01,master-es02,master-es03
+      - network.bind_host=0.0.0.0
+      - network.publish_host=master-es02
+      - discovery.seed_hosts=master-es01,master-es02,master-es03
+      - discovery.zen.minimum_master_nodes=2
+      - node.master=true
+      - node.data=false
+      - node.ingest=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # volumes:
+    #   - data02:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9200
+      - 9301:9300
+    networks:
+      - elastic
+
+  master-es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: master-es03
+    environment:
+      - node.name=master-es03
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=master-es01,master-es02,master-es03
+      - network.bind_host=0.0.0.0
+      - network.publish_host=master-es03
+      - discovery.seed_hosts=master-es01,master-es02,master-es03
+      - discovery.zen.minimum_master_nodes=2
+      - node.master=true
+      - node.data=false
+      - node.ingest=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # volumes:
+    #   - data03:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
+      - 9302:9300
+    networks:
+      - elastic
+
+  # es01:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+  #   container_name: es01
+  #   environment:
+  #     - node.name=es01
+  #     - cluster.name=es-docker-cluster
+  #     - cluster.initial_master_nodes=master-es01,master-es02,master-es03
+  #     - network.bind_host=0.0.0.0
+  #     - network.publish_host=es01
+  #     - discovery.seed_hosts=master-es01,master-es02,master-es03,es01,es02,es03
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - data01:/usr/share/elasticsearch/data
+  #   networks:
+  #     - elastic
+
+  # es02:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+  #   container_name: es02
+  #   environment:
+  #     - node.name=es02
+  #     - cluster.name=es-docker-cluster
+  #     - cluster.initial_master_nodes=master-es01,master-es02,master-es03
+  #     - network.bind_host=0.0.0.0
+  #     - network.publish_host=es02
+  #     - discovery.seed_hosts=master-es01,master-es02,master-es03,es01,es02,es03
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - data02:/usr/share/elasticsearch/data
+  #   networks:
+  #     - elastic
+
+  # es03:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+  #   container_name: es03
+  #   environment:
+  #     - node.name=es03
+  #     - cluster.name=es-docker-cluster
+  #     - cluster.initial_master_nodes=master-es01,master-es02,master-es03
+  #     - network.bind_host=0.0.0.0
+  #     - network.publish_host=es03
+  #     - discovery.seed_hosts=master-es01,master-es02,master-es03,es01,es02,es03
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - data02:/usr/share/elasticsearch/data
+  #   networks:
+  #     - elastic
+
+  # kib01:
+  #   image: docker.elastic.co/kibana/kibana:7.15.0
+  #   container_name: kib01
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     ELASTICSEARCH_URL: http://master-es01:9200,http://master-es03:9201,mhttp://master-es03:9202
+  #     ELASTICSEARCH_HOSTS: '["http://master-es01:9200","http://master-es02:9201","http://master-es03:9202","http://es01:9200","http://es02:9200","http://es03:9200"]'
+  #   networks:
+  #     - elastic
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
