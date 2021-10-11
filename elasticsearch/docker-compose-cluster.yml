@@ -19,13 +19,11 @@ services:
       - xpack.security.enabled=false
       - xpack.security.transport.ssl.enabled=false
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - master01:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
       - 9300:9300
@@ -51,13 +49,11 @@ services:
       - xpack.security.enabled=false
       - xpack.security.transport.ssl.enabled=false
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - master02:/usr/share/elasticsearch/data
     ports:
       - 9201:9201
       - 9301:9301
@@ -83,13 +79,11 @@ services:
       - xpack.security.enabled=false
       - xpack.security.transport.ssl.enabled=false
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - master03:/usr/share/elasticsearch/data
     ports:
       - 9202:9202
       - 9302:9302
@@ -104,8 +98,7 @@ services:
       - cluster.name=es-docker-cluster
       - network.bind_host=0.0.0.0
       - network.publish_host=data-node01
-      - discovery.zen.ping.unicast.hosts=master-node01:9300,master-node02:9301,master-node03:9302
-      # - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302,data-node01:9303,data-node02:9304,data-node03:9305
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
       - node.master=false
       - node.data=true
       - node.ingest=false
@@ -116,7 +109,7 @@ services:
       - xpack.security.enabled=false
       - xpack.security.transport.ssl.enabled=false
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms3g -Xmx3g"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -138,8 +131,7 @@ services:
       - cluster.name=es-docker-cluster
       - network.bind_host=0.0.0.0
       - network.publish_host=data-node02
-      - discovery.zen.ping.unicast.hosts=master-node01:9300,master-node02:9301,master-node03:9302
-      # - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302,data-node01:9303,data-node02:9304,data-node03:9305
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
       - node.master=false
       - node.data=true
       - node.ingest=false
@@ -148,7 +140,7 @@ services:
       - transport.tcp.port=9304
       - transport.tcp.compress=true
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms3g -Xmx3g"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -170,8 +162,7 @@ services:
       - cluster.name=es-docker-cluster
       - network.bind_host=0.0.0.0
       - network.publish_host=data-node03
-      # - discovery.zen.ping.unicast.hosts=master-node01:9300,master-node02:9301,master-node03:9302
-      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302,data-node01:9303,data-node02:9304,data-node03:9305
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
       - node.master=false
       - node.data=true
       - node.ingest=false
@@ -180,7 +171,7 @@ services:
       - transport.tcp.port=9305
       - transport.tcp.compress=true
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms3g -Xmx3g"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -194,24 +185,74 @@ services:
     networks:
       - elastic
 
-  kib:
+  ingestNode01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: ingest-node01
+    environment:
+      - node.name=ingest-node01
+      - cluster.name=es-docker-cluster
+      - network.bind_host=0.0.0.0
+      - network.publish_host=ingest-node01
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
+      - node.master=false
+      - node.data=false
+      - node.ingest=true
+      - node.ml=false
+      - http.port=9206
+      - transport.tcp.port=9306
+      - transport.tcp.compress=true
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9206:9206
+      - 9306:9306
+    networks:
+      - elastic
+
+  coordinateNode01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: coordinate-node01
+    environment:
+      - node.name=coordinate-node01
+      - cluster.name=es-docker-cluster
+      - network.bind_host=0.0.0.0
+      - network.publish_host=coordinate-node01
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
+      - node.master=false
+      - node.data=false
+      - node.ingest=false
+      - node.ml=false
+      - http.port=9209
+      - transport.tcp.port=9309
+      - transport.tcp.compress=true
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9209:9209
+      - 9309:9309
+    networks:
+      - elastic
+
+  kibana:
     image: docker.elastic.co/kibana/kibana:7.15.0
-    container_name: kib
+    container_name: kibana
     ports:
       - 5601:5601
     environment:
-      ELASTICSEARCH_URL: http://master-node01:9200
-      ELASTICSEARCH_HOSTS: '["http://master-node01:9200","http://master-node02:9201","http://master-node03:9202"]'
+      ELASTICSEARCH_URL: http:/coordinate-node01:9209
+      ELASTICSEARCH_HOSTS: '["http://coordinate-node01:9209"]'
     networks:
       - elastic
 
 volumes:
-  master01:
-    driver: local
-  master02:
-    driver: local
-  master03:
-    driver: local
   data01:
     driver: local
   data02:
