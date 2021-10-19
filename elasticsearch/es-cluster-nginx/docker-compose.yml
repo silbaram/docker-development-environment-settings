@@ -28,7 +28,7 @@ services:
       - 9200:9200
       - 9300:9300
     networks:
-      - elastic
+      - proxyserverslastic
 
   masterNode02:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -58,7 +58,7 @@ services:
       - 9201:9201
       - 9301:9301
     networks:
-      - elastic
+      - proxyserverslastic
 
   masterNode03:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -88,7 +88,8 @@ services:
       - 9202:9202
       - 9302:9302
     networks:
-      - elastic
+      - proxyserverslastic
+
 
   dataNode01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -115,13 +116,12 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data01:/usr/share/elasticsearch/data
-      - backup:/usr/share/elasticsearch/backup
+      - elasticdata01:/usr/share/elasticsearch/data
     ports:
       - 9203:9203
       - 9303:9303
     networks:
-      - elastic
+      - proxyserverslastic
 
   dataNode02:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -146,13 +146,12 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data02:/usr/share/elasticsearch/data
-      - backup:/usr/share/elasticsearch/backup
+      - elasticdata02:/usr/share/elasticsearch/data
     ports:
       - 9204:9204
       - 9304:9304
     networks:
-      - elastic
+      - proxyserverslastic
 
   dataNode03:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -177,41 +176,12 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data03:/usr/share/elasticsearch/data
-      - backup:/usr/share/elasticsearch/backup
+      - elasticdata03:/usr/share/elasticsearch/data
     ports:
       - 9205:9205
       - 9305:9305
     networks:
-      - elastic
-
-  ingestNode01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
-    container_name: ingest-node01
-    environment:
-      - node.name=ingest-node01
-      - cluster.name=es-docker-cluster
-      - network.bind_host=0.0.0.0
-      - network.publish_host=ingest-node01
-      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
-      - node.master=false
-      - node.data=false
-      - node.ingest=true
-      - node.ml=false
-      - http.port=9206
-      - transport.tcp.port=9306
-      - transport.tcp.compress=true
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    ports:
-      - 9206:9206
-      - 9306:9306
-    networks:
-      - elastic
+      - proxyserverslastic
 
   coordinateNode01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -226,8 +196,8 @@ services:
       - node.data=false
       - node.ingest=false
       - node.ml=false
-      - http.port=9209
-      - transport.tcp.port=9309
+      - http.port=9210
+      - transport.tcp.port=9310
       - transport.tcp.compress=true
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -236,10 +206,38 @@ services:
         soft: -1
         hard: -1
     ports:
-      - 9209:9209
-      - 9309:9309
+      - 9210:9210
+      - 9310:9310
     networks:
-      - elastic
+      - proxyserverslastic
+
+  coordinateNode02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: coordinate-node02
+    environment:
+      - node.name=coordinate-node02
+      - cluster.name=es-docker-cluster
+      - network.bind_host=0.0.0.0
+      - network.publish_host=coordinate-node02
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
+      - node.master=false
+      - node.data=false
+      - node.ingest=false
+      - node.ml=false
+      - http.port=9211
+      - transport.tcp.port=9311
+      - transport.tcp.compress=true
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9211:9211
+      - 9311:9311
+    networks:
+      - proxyserverslastic
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.15.0
@@ -247,21 +245,31 @@ services:
     ports:
       - 5601:5601
     environment:
-      ELASTICSEARCH_URL: http:/coordinate-node01:9209
-      ELASTICSEARCH_HOSTS: '["http://coordinate-node01:9209"]'
+      # ELASTICSEARCH_HOSTS: '["http://coordinate-node01:9210", "http://coordinate-node02:9211"]'
+      ELASTICSEARCH_HOSTS: '["http://coordinate-node01:9210"]'
     networks:
-      - elastic
+      - proxyserverslastic
+
+  nginxProxyServer:
+    image: nginx:latest
+    container_name: nginxProxy-server
+    volumes:
+      - type: bind
+        source: ./nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+    ports:
+      - 9000:9000
+    networks:
+      - proxyserverslastic
 
 volumes:
-  data01:
+  elasticdata01:
     driver: local
-  data02:
+  elasticdata02:
     driver: local
-  data03:
-    driver: local
-  backup:
+  elasticdata03:
     driver: local
 
 networks:
-  elastic:
+  proxyserverslastic:
     driver: bridge
