@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  db:
+    image: mysql
+    container_name: local-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    command:
+      - --character-set-server=utf8mb4
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+volumes:
+  mysqldata:
+    driver: local
