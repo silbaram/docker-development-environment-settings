@@ -9,7 +9,7 @@ services:
       - cluster.initial_master_nodes=master-node01,master-node02,master-node03
       - network.bind_host=0.0.0.0
       - network.publish_host=master-node01
-      - discovery.seed_hosts=master-node01:9300,master-node03:9301,data-node02:9302
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
       - node.master=true
       - node.data=false
       - node.ingest=false
@@ -39,7 +39,7 @@ services:
       - cluster.initial_master_nodes=master-node01,master-node02,master-node03
       - network.bind_host=0.0.0.0
       - network.publish_host=master-node02
-      - discovery.seed_hosts=master-node01:9300,master-node03:9301,data-node02:9302
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
       - node.master=true
       - node.data=false
       - node.ingest=false
@@ -69,7 +69,7 @@ services:
       - cluster.initial_master_nodes=master-node01,master-node02,master-node03
       - network.bind_host=0.0.0.0
       - network.publish_host=master-node03
-      - discovery.seed_hosts=master-node01:9300,master-node03:9301,data-node02:9302
+      - discovery.seed_hosts=master-node01:9300,master-node02:9301,master-node03:9302
       - node.master=true
       - node.data=false
       - node.ingest=false
