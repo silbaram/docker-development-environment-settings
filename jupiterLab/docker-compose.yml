@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  jupyter:
+    build: .
+    container_name: jupyter
+    volumes:
+      - ./code:/code
+    ports:
+      - "8888:8888"
+    working_dir: /code
+    command: >
+      bash -c "pip install --upgrade pip 
+      && pip install -r requirements.txt 
+      && jupyter lab --no-browser --port=8888 --ip=0.0.0.0 --allow-root --NotebookApp.token=''"
