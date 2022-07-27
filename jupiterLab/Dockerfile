@@ -1,9 +1,13 @@
-FROM python:3.9.12
+FROM python:3.10.5
+
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN mkdir /code
-WORKDIR /code
-COPY code/requirements.txt /code/
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY /code/requirements.txt .
 RUN pip install -r requirements.txt
-
-COPY ./code/ /code/
-
