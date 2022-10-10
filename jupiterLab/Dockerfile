@@ -9,5 +9,5 @@ RUN apt-get update && \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-COPY /code/requirements.txt .
-RUN pip install -r requirements.txt
+COPY /code/requirements-jupyterlab.txt .
+RUN pip install -r requirements-jupyterlab.txt
