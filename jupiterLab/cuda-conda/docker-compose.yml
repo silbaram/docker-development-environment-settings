@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  conda:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cuda
+    volumes:
+      - ./code:/home/code
+    ports:
+      - "8888:8888"
+    working_dir: /home/code
+    command: >
+      bash -c "pip install --upgrade pip 
+      && jupyter lab --no-browser --port=8888 --ip=0.0.0.0 --allow-root --NotebookApp.token=''"
