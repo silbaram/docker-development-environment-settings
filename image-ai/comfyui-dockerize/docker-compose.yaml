@@ -1,0 +1,23 @@
+services:
+  comfy-ui:
+    build:
+      context: ./docker
+      args:
+        - IMAGE_VERSION=2.9.0-cuda13.0-cudnn9-runtime
+        - COMFYUI_VERSION=v0.3.29
+        - MIRROR_URL=
+    ports:
+      - "${HTTP_PORT:-8188}:8188"
+    volumes:
+      - custom-nodes:/comfyUI/custom_nodes
+      - ${MODELS_DIR:-./models}:/comfyUI/models
+      - ./data/outputs:/comfyUI/output
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [compute, utility]
+volumes:
+  custom-nodes:

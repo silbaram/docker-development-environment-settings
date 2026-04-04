@@ -1,0 +1,50 @@
+# Docker Compose 파일 형식 버전을 지정합니다.
+version: '3.8'
+
+services:
+  # Elasticsearch 서비스 설정
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: es01
+    environment:
+      # 단일 노드로 실행되도록 설정합니다. 개발/테스트 환경에 필수입니다.
+      - discovery.type=single-node
+      # 로컬 테스트 편의를 위해 보안 기능을 비활성화합니다.
+      # 중요: 실제 운영 환경에서는 절대 사용하면 안 됩니다!
+      - xpack.security.enabled=false
+      # JVM 힙 메모리 크기를 1GB로 제한합니다. 로컬 PC의 부담을 줄여줍니다.
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ports:
+      # 외부에서 Elasticsearch에 접속하기 위한 포트입니다. (HTTP)
+      - "9200:9200"
+    volumes:
+      # 데이터를 영속적으로 저장하기 위한 볼륨 설정입니다. 컨테이너가 삭제돼도 데이터는 남습니다.
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  # Kibana 서비스 설정
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    container_name: kibana
+    environment:
+      # Kibana가 연결할 Elasticsearch 주소를 지정합니다.
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+    ports:
+      # 외부에서 Kibana UI에 접속하기 위한 포트입니다.
+      - "5601:5601"
+    depends_on:
+      # es01 서비스가 실행된 후에 kibana 서비스가 시작되도록 보장합니다.
+      - es01
+    networks:
+      - elastic
+
+# Docker 볼륨 정의
+volumes:
+  esdata:
+    driver: local
+
+# Docker 네트워크 정의
+networks:
+  elastic:
+    driver: bridge
